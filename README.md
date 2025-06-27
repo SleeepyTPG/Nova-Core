@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="novacore.png" alt="NovaCore Logo" width="400"/>
+  <img src="resources/novacore.png" alt="NovaCore Logo" width="400"/>
 </p>
 
 # ✨ NovaCore Discord Bot
