@@ -45,7 +45,7 @@
 
 ## 📸 Preview
 
-![NovaCore Dashboard Preview](https://placehold.co/800x200?text=NovaCore+Dashboard+Preview)
+![NovaCore Dashboard Preview](https://placehold.co/800x200?text=TBA & WIP)
 
 ---
 
