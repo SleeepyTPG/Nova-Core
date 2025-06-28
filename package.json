@@ -1,0 +1,28 @@
+{
+  "name": "novacore-discord-bot",
+  "version": "0.1.0 - Alpha",
+  "description": "NovaCore - A next-generation, all-in-one Discord server assistant bot.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "novacore",
+    "moderation",
+    "utility",
+    "fun"
+  ],
+  "author": "Sleeepy",
+  "license": "LGPL-2.1",
+  "dependencies": {
+    "discord.js": "^14.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}

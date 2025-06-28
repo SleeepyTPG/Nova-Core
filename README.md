@@ -70,4 +70,4 @@ NovaCore is licensed under the [LGPL v2.1](LICENSE).
 
 ---
 
-> **NovaCore** – The intelligent core your
+> **NovaCore** – A next-generation, all-in-one Discord server assistant bot.
