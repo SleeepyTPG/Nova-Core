@@ -62,13 +62,13 @@ module.exports = {
     const reason = interaction.options.getString('reason') || 'No reason provided';
 
     if (!member) {
-      await interaction.reply({ content: 'User not found in this server.', ephemeral: true });
+      await interaction.reply({ content: 'User not found in this server.', flags: 64 });
       return;
     }
 
     if (command === 'ban') {
       if (!member.bannable) {
-        await interaction.reply({ content: 'I cannot ban this user.', ephemeral: true });
+        await interaction.reply({ content: 'I cannot ban this user.', flags: 64 });
         return;
       }
       await member.ban({ reason });
@@ -77,7 +77,7 @@ module.exports = {
 
     if (command === 'kick') {
       if (!member.kickable) {
-        await interaction.reply({ content: 'I cannot kick this user.', ephemeral: true });
+        await interaction.reply({ content: 'I cannot kick this user.', flags: 64 });
         return;
       }
       await member.kick(reason);
@@ -86,7 +86,7 @@ module.exports = {
 
     if (command === 'timeout') {
       if (!member.moderatable) {
-        await interaction.reply({ content: 'I cannot timeout this user.', ephemeral: true });
+        await interaction.reply({ content: 'I cannot timeout this user.', flags: 64 });
         return;
       }
       const duration = interaction.options.getInteger('duration');

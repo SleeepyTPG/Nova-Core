@@ -1,7 +1,5 @@
-// Simple in-memory store for demo purposes. Replace with a database for production.
-
-const presetRules = {}; // { guildId: { ruleName: enabled } }
-const customRules = {}; // { guildId: [ { trigger, action } ] }
+const presetRules = {};
+const customRules = {};
 
 module.exports = {
   setPresetRule(guildId, rule, enabled) {

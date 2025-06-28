@@ -15,7 +15,7 @@ module.exports = {
       await command.execute(interaction);
     } catch (error) {
       console.error(error);
-      await interaction.reply({ content: 'There was an error executing this moderation command.', ephemeral: true });
+      await interaction.reply({ content: 'There was an error executing this moderation command.', flags: 64 });
     }
   }
 }
