@@ -37,4 +37,9 @@ if (fs.existsSync(eventsPath)) {
   }
 }
 
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+  client.user.setActivity('Nova Core', { type: 'WATCHING' });
+});
+
 client.login(process.env.TOKEN);
