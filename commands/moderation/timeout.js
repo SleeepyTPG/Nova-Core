@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const ms = require('ms'); // Make sure to install 'ms' package: npm install ms
+const ms = require('ms');
 
 module.exports = {
     data: new SlashCommandBuilder()
