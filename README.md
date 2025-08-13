@@ -33,7 +33,7 @@
 ## 🛠️ Getting Started
 
 1. **Invite NovaCore**  
-   [Click here to invite NovaCore to your server!](#)
+   [Click here to invite NovaCore to your server!](https://discord.com/oauth2/authorize?client_id=1395883827632668702)
 
 2. **Configure Your Server**  
    Use `/setup` or the dashboard to customize NovaCore for your community.
@@ -51,7 +51,7 @@
 
 ## 📚 Documentation
 
-- [Full Command List](#)
+- [Full Command List](#WORK+IN+PROGRESS)
 - [Support & Community](www.discord.gg/z4C6T5m88D)
 
 ---
