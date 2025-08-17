@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,30 +9,79 @@ module.exports = {
 
         const owner = await guild.fetchOwner();
         const created = `<t:${Math.floor(guild.createdTimestamp / 1000)}:F>`;
-        const roles = guild.roles.cache.filter(r => r.id !== guild.id).map(r => r.name).length;
-        const channels = guild.channels.cache.size;
+        const roles = guild.roles.cache.filter(r => r.id !== guild.id).map(r => r.name);
+        const channels = {
+            text: guild.channels.cache.filter(c => c.type === 0).size,
+            voice: guild.channels.cache.filter(c => c.type === 2).size,
+            categories: guild.channels.cache.filter(c => c.type === 4).size,
+            total: guild.channels.cache.size
+        };
         const emojis = guild.emojis.cache.size;
         const boosts = guild.premiumSubscriptionCount;
         const boostLevel = guild.premiumTier;
-        const members = guild.memberCount;
+        const members = {
+            total: guild.memberCount,
+            online: guild.members.cache.filter(m => m.presence?.status === 'online').size,
+            bots: guild.members.cache.filter(m => m.user.bot).size
+        };
 
-        const embed = new EmbedBuilder()
-            .setTitle(`Server Info: ${guild.name}`)
-            .setThumbnail(guild.iconURL())
-            .setColor(0x2ecc71)
-            .addFields(
-                { name: 'Server ID', value: guild.id, inline: true },
-                { name: 'Owner', value: `${owner.user.tag}`, inline: true },
-                { name: 'Created', value: created, inline: true },
-                { name: 'Members', value: `${members}`, inline: true },
-                { name: 'Roles', value: `${roles}`, inline: true },
-                { name: 'Channels', value: `${channels}`, inline: true },
-                { name: 'Emojis', value: `${emojis}`, inline: true },
-                { name: 'Boosts', value: `${boosts} (Level ${boostLevel})`, inline: true }
+        const container = new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`## 🏰 Server Information: ${guild.name}`)
             )
-            .setFooter({ text: `Requested by ${interaction.user.tag}`, iconURL: interaction.user.displayAvatarURL() });
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### 📌 Basic Information\n` +
+                        `> **Server ID:** ${guild.id}\n` +
+                        `> **Owner:** ${owner.user.tag}\n` +
+                        `> **Created:** ${created}\n` +
+                        `> **Verification Level:** ${guild.verificationLevel}`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### 👥 Members\n` +
+                        `> **Total Members:** ${members.total}\n` +
+                        `> **Humans:** ${members.total - members.bots}\n` +
+                        `> **Bots:** ${members.bots}`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### 📊 Statistics\n` +
+                        `> **Channels:** ${channels.total} (${channels.text} text, ${channels.voice} voice, ${channels.categories} categories)\n` +
+                        `> **Roles:** ${roles.length}\n` +
+                        `> **Emojis:** ${emojis}\n` +
+                        `> **Boosts:** ${boosts} (Level ${boostLevel})`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`*Requested by ${interaction.user.tag}*`)
+            );
 
-        await interaction.reply({ embeds: [embed]
+        await interaction.reply({
+            components: [container]
         });
     }
 };

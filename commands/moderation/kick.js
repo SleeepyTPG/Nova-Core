@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -34,15 +34,52 @@ module.exports = {
         }
 
         try {
-            await target.send(`You have been kicked from **${interaction.guild.name}**.\nReason: ${reason}`);
+            const dmContainer = new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `## 👢 You Have Been Kicked\n\n` +
+                            `You have been kicked from **${interaction.guild.name}**\n\n` +
+                            `**Reason:** ${reason}\n` +
+                            `**Moderator:** ${interaction.user.tag}`
+                        )
+                );
+            await target.send({ components: [dmContainer] });
         } catch (err) {
         }
 
         await member.kick(reason);
 
-        await interaction.reply({
-            content: `👢 **${target.tag}** has been kicked.\nReason: ${reason}`,
-            ephemeral: false
-        });
+        const container = new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`## 👢 Member Kicked`)
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### User Information\n` +
+                        `> **User:** ${target.tag} (${target.id})\n` +
+                        `> **Kicked by:** ${interaction.user.tag}\n` +
+                        `> **Date:** <t:${Math.floor(Date.now()/1000)}:F>`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### Kick Details\n` +
+                        `> **Reason:** ${reason}`
+                    )
+            );
+
+        await interaction.reply({ components: [container] });
     }
 };

@@ -1,6 +1,37 @@
 {
+  "name": "nova-core",
+  "version": "0.8.4",
+  "description": "A powerful Discord bot with moderation, utility, and fun commands",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js",
+    "test": "jest"
+  },
+  "author": "Sleeepy",
+  "license": "MIT",
   "dependencies": {
+    "discord.js": "^14.13.0",
+    "dotenv": "^16.3.1",
     "ms": "^2.1.3",
-    "node-fetch": "^3.3.2"
-  }
+    "node-fetch": "^2.6.12"
+  },
+  "devDependencies": {
+    "jest": "^29.6.4",
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.9.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/nova-core"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "discord.js",
+    "moderation",
+    "utility"
+  ]
 }

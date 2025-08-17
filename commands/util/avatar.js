@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,22 +18,62 @@ module.exports = {
 
         if (showServer) {
             const guild = interaction.guild;
-            const embed = new EmbedBuilder()
-                .setTitle(`Server Icon: ${guild.name}`)
-                .setImage(guild.iconURL({ size: 1024 }))
-                .setColor(0x7289da)
-                .setFooter({ text: `Requested by ${interaction.user.tag}`, iconURL: interaction.user.displayAvatarURL() });
-            return interaction.reply({ embeds: [embed] });
+            const container = new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `## 🖼️ Server Icon: ${guild.name}\n\n` +
+                            `[View Original](${guild.iconURL({ size: 4096 })})\n\n` +
+                            `![Server Icon](${guild.iconURL({ size: 1024 })})`
+                        )
+                )
+                .addSeperatorComponents(
+                    new SeperatorBuilder()
+                        .setDivider(true)
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(`*Requested by ${interaction.user.tag}*`)
+                );
+
+            return interaction.reply({
+                components: [container]
+            });
         }
 
         const targetUser = user || interaction.user;
-        const embed = new EmbedBuilder()
-            .setTitle(`Avatar of ${targetUser.tag}`)
-            .setImage(targetUser.displayAvatarURL({ size: 1024, dynamic: true }))
-            .setColor(0x7289da)
-            .setFooter({ text: `Requested by ${interaction.user.tag}`, iconURL: interaction.user.displayAvatarURL() });
+        const container = new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `## 👤 Avatar: ${targetUser.tag}\n\n` +
+                        `[View Original](${targetUser.displayAvatarURL({ size: 4096, dynamic: true })})\n\n` +
+                        `![User Avatar](${targetUser.displayAvatarURL({ size: 1024, dynamic: true })})`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### Additional Information\n` +
+                        `> **User ID:** ${targetUser.id}\n` +
+                        `> **Account Created:** <t:${Math.floor(targetUser.createdTimestamp / 1000)}:F>`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`*Requested by ${interaction.user.tag}*`)
+            );
 
-        await interaction.reply({ embeds: [embed]
+        await interaction.reply({
+            components: [container]
         });
     }
 };

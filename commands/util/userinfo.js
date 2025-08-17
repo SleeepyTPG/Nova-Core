@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,39 +12,72 @@ module.exports = {
         const user = interaction.options.getUser('user') || interaction.user;
         const member = await interaction.guild.members.fetch(user.id).catch(() => null);
 
-        const embed = new EmbedBuilder()
-            .setTitle(`User Info: ${user.tag}`)
-            .setThumbnail(user.displayAvatarURL())
-            .setColor(0x3498db)
-            .addFields(
-                { name: 'Username', value: user.username, inline: true },
-                { name: 'Tag', value: `#${user.discriminator}`, inline: true },
-                { name: 'User ID', value: user.id, inline: true },
-                { name: 'Bot', value: user.bot ? 'Yes' : 'No', inline: true },
-                { name: 'Created', value: `<t:${Math.floor(user.createdTimestamp / 1000)}:F>`, inline: true }
+        const container = new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`## 👤 User Information: ${user.tag}`)
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### Basic Information\n` +
+                        `> **Username:** ${user.username}\n` +
+                        `> **Tag:** #${user.discriminator}\n` +
+                        `> **User ID:** ${user.id}\n` +
+                        `> **Bot:** ${user.bot ? 'Yes' : 'No'}\n` +
+                        `> **Account Created:** <t:${Math.floor(user.createdTimestamp / 1000)}:F>`
+                    )
             );
 
         if (member) {
-            embed.addFields(
-                { name: 'Nickname', value: member.nickname || 'None', inline: true },
-                { name: 'Joined Server', value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:F>`, inline: true },
-                { name: 'Roles', value: member.roles.cache.filter(r => r.id !== interaction.guild.id).map(r => r.name).join(', ') || 'None', inline: false }
-            );
+            container
+                .addSeperatorComponents(
+                    new SeperatorBuilder()
+                        .setDivider(true)
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `### Server Information\n` +
+                            `> **Nickname:** ${member.nickname || 'None'}\n` +
+                            `> **Joined Server:** <t:${Math.floor(member.joinedTimestamp / 1000)}:F>\n` +
+                            `> **Roles:** ${member.roles.cache.filter(r => r.id !== interaction.guild.id).map(r => `\`${r.name}\``).join(', ') || 'None'}`
+                        )
+                );
+
+            if (member.voice.channel) {
+                container
+                    .addSeperatorComponents(
+                        new SeperatorBuilder()
+                            .setDivider(true)
+                    )
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                `### Voice Status\n` +
+                                `> **Current Channel:** ${member.voice.channel.name}\n` +
+                                `> **Joined Voice:** <t:${Math.floor(member.voice.joinedTimestamp / 1000)}:R>`
+                            )
+                    );
+            }
         }
 
-        await interaction.reply({ embeds: [embed] });
-        if (member && member.voice.channel) {
-            embed.addFields(
-                { name: 'Voice Channel', value: member.voice.channel.name, inline: true },
-                { name: 'Joined Voice', value: `<t:${Math.floor(member.voice.joinedTimestamp / 1000)}:F>`, inline: true }
+        container
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`*Requested by ${interaction.user.tag}*`)
             );
-            await interaction.editReply({ embeds: [embed] });
-        }
-        else {
-            embed.addFields(
-                { name: 'Voice Channel', value: 'Not in a voice channel', inline: true }
-            );
-            await interaction.editReply({ embeds: [embed] });
-        }
+
+        await interaction.reply({
+            components: [container]
+        });
     }
 };

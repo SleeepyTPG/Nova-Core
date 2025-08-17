@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -34,15 +34,53 @@ module.exports = {
         }
 
         try {
-            await target.send(`You have been banned from **${interaction.guild.name}**.\nReason: ${reason}`);
+            const dmContainer = new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `## 🔨 You Have Been Banned\n\n` +
+                            `You have been banned from **${interaction.guild.name}**\n\n` +
+                            `**Reason:** ${reason}\n` +
+                            `**Moderator:** ${interaction.user.tag}\n\n` +
+                            `*You can appeal this ban by contacting the server administrators.*`
+                        )
+                );
+            await target.send({ components: [dmContainer] });
         } catch (err) {
-            
         }
 
         await member.ban({ reason });
 
-        await interaction.reply({
-            content: `🔨 **${target.tag}** has been banned.\nReason: ${reason}`,
-        });
+        const container = new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`## 🔨 Member Banned`)
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### User Information\n` +
+                        `> **User:** ${target.tag} (${target.id})\n` +
+                        `> **Banned by:** ${interaction.user.tag}\n` +
+                        `> **Date:** <t:${Math.floor(Date.now()/1000)}:F>`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### Ban Details\n` +
+                        `> **Reason:** ${reason}`
+                    )
+            );
+
+        await interaction.reply({ components: [container] });
     }
 };

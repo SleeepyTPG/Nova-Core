@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
 const ms = require('ms');
 
 module.exports = {
@@ -40,20 +40,64 @@ module.exports = {
         }
 
         const durationMs = ms(durationInput);
-        if (!durationMs || durationMs < 10000 || durationMs > 28 * 24 * 60 * 60 * 1000) {
-            return interaction.reply({ content: 'Invalid duration. Please use formats like `10m`, `1h`, `2d` (min: 10s, max: 28d).', Flags: 64 });
+        if (!durationMs || durationMs < 10000 || durationMs > 14 * 24 * 60 * 60 * 1000) {
+            return interaction.reply({ 
+                content: 'Invalid duration. Please use formats like `10m`, `1h`, `2d` (min: 10s, max: 14d).', 
+                Flags: 64 
+            });
         }
 
         try {
-            await target.send(`You have been timed out in **${interaction.guild.name}** for ${durationInput}.\nReason: ${reason}`);
+            const dmContainer = new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `## ⏳ You Have Been Timed Out\n\n` +
+                            `You have been timed out in **${interaction.guild.name}**\n\n` +
+                            `**Duration:** ${durationInput}\n` +
+                            `**Reason:** ${reason}\n` +
+                            `**Moderator:** ${interaction.user.tag}\n` +
+                            `**Expires:** <t:${Math.floor((Date.now() + durationMs) / 1000)}:R>`
+                        )
+                );
+            await target.send({ components: [dmContainer] });
         } catch (err) {
         }
 
         await member.timeout(durationMs, reason);
+        
+        const container = new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`## ⏳ Member Timed Out`)
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### User Information\n` +
+                        `> **User:** ${target.tag} (${target.id})\n` +
+                        `> **Timed out by:** ${interaction.user.tag}\n` +
+                        `> **Date:** <t:${Math.floor(Date.now()/1000)}:F>`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### Timeout Details\n` +
+                        `> **Duration:** ${durationInput}\n` +
+                        `> **Expires:** <t:${Math.floor((Date.now() + durationMs) / 1000)}:R>\n` +
+                        `> **Reason:** ${reason}`
+                    )
+            );
 
-        await interaction.reply({
-            content: `⏳ **${target.tag}** has been timed out for **${durationInput}**.\nReason: ${reason}`,
-            ephemeral: false
-        });
+        await interaction.reply({ components: [container] });
     }
 };

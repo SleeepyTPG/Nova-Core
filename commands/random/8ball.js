@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
 
 const responses = [
     "It is certain.",
@@ -32,6 +32,36 @@ module.exports = {
     async execute(interaction) {
         const question = interaction.options.getString('question');
         const answer = responses[Math.floor(Math.random() * responses.length)];
-        await interaction.reply(`🎱 ${answer}`);
+
+        const container = new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`## 🎱 Magic 8-Ball`)
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### Question\n` +
+                        `> ${question}\n\n` +
+                        `### Answer\n` +
+                        `> *${answer}*`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`*Asked by ${interaction.user.tag}*`)
+            );
+
+        await interaction.reply({
+            components: [container]
+        });
     }
 };

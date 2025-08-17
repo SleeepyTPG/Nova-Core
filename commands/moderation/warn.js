@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -38,15 +38,24 @@ module.exports = {
         const member = await interaction.guild.members.fetch(target.id).catch(() => null);
 
         if (!interaction.member.permissions.has('ModerateMembers')) {
-            return interaction.reply({ content: 'You do not have permission to warn members.', Flags: 64 });
+            return interaction.reply({ 
+                content: 'You do not have permission to warn members.', 
+                Flags: 64 
+            });
         }
 
         if (!member) {
-            return interaction.reply({ content: 'User not found in this server.', Flags: 64 });
+            return interaction.reply({ 
+                content: 'User not found in this server.', 
+                Flags: 64 
+            });
         }
 
         if (member.id === interaction.guild.ownerId) {
-            return interaction.reply({ content: 'You cannot warn the server owner.', Flags: 64 });
+            return interaction.reply({ 
+                content: 'You cannot warn the server owner.', 
+                Flags: 64 
+            });
         }
 
         const warnings = loadWarnings();
@@ -66,22 +75,53 @@ module.exports = {
         saveWarnings(warnings);
 
         try {
-            await target.send(`⚠️ You have been warned in **${interaction.guild.name}**.\nReason: ${reason}\nModerator: ${interaction.user.tag}\nTotal warnings: ${warnings[guildId][userId].length}`);
+            const dmContainer = new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `## ⚠️ Warning Received\n\n` +
+                            `You have been warned in **${interaction.guild.name}**\n\n` +
+                            `**Reason:** ${reason}\n` +
+                            `**Moderator:** ${interaction.user.tag}\n` +
+                            `**Total Warnings:** ${warnings[guildId][userId].length}\n\n` +
+                            `*Use \`/warnings\` in the server to view all your warnings.*`
+                        )
+                );
+            await target.send({ components: [dmContainer] });
         } catch (err) {
         }
-        
-        const embed = new EmbedBuilder()
-            .setTitle('User Warned')
-            .setColor(0xFFA500)
-            .setThumbnail(target.displayAvatarURL())
-            .addFields(
-                { name: 'User', value: `${target.tag} (${target.id})`, inline: true },
-                { name: 'Moderator', value: `${interaction.user.tag}`, inline: true },
-                { name: 'Reason', value: reason, inline: false },
-                { name: 'Total Warnings', value: `${warnings[guildId][userId].length}`, inline: true },
-                { name: 'Date', value: `<t:${Math.floor(Date.now()/1000)}:F>`, inline: true }
+
+        const container = new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`## ⚠️ Warning Issued`)
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### User Information\n` +
+                        `> **User:** ${target.tag} (${target.id})\n` +
+                        `> **Warned by:** ${interaction.user.tag}\n` +
+                        `> **Date:** <t:${Math.floor(Date.now()/1000)}:F>`
+                    )
+            )
+            .addSeperatorComponents(
+                new SeperatorBuilder()
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `### Warning Details\n` +
+                        `> **Reason:** ${reason}\n` +
+                        `> **Total Warnings:** ${warnings[guildId][userId].length}`
+                    )
             );
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.reply({ components: [container] });
     }
 };
