@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, TextDisplayBuilder, SeperatorBuilder, SeperatorSpacingSize, ContainerBuilder } = require('discord.js');
+const { SlashCommandBuilder, TextDisplayBuilder, SeparatorBuilder, SeparatorSpacingSize, ContainerBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -35,18 +35,18 @@ module.exports = {
                 new TextDisplayBuilder()
                     .setContent('## 📜 Nova Core Commands\n*A powerful Discord bot with various features*')
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setSize(SeperatorSpacingSize.Medium)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSize(SeparatorSpacingSize.Medium)
                     .setDivider(true)
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
                     .setContent(commandList)
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setSize(SeperatorSpacingSize.Medium)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSize(SeparatorSpacingSize.Medium)
                     .setDivider(true)
             )
             .addTextDisplayComponents(
