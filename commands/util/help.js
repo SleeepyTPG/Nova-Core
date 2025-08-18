@@ -37,7 +37,6 @@ module.exports = {
             )
             .addSeparatorComponents(
                 new SeparatorBuilder()
-                    .setSize(SeparatorSpacingSize.Medium)
                     .setDivider(true)
             )
             .addTextDisplayComponents(
@@ -46,7 +45,6 @@ module.exports = {
             )
             .addSeparatorComponents(
                 new SeparatorBuilder()
-                    .setSize(SeparatorSpacingSize.Medium)
                     .setDivider(true)
             )
             .addTextDisplayComponents(
