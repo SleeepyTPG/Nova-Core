@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, TextDisplayBuilder, SeparatorBuilder, SeparatorSpacingSize, ContainerBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -30,28 +30,12 @@ module.exports = {
             commandList += '\n';
         }
 
-        const container = new ContainerBuilder()
-            .addTextDisplayComponents(
-                new TextDisplayBuilder()
-                    .setContent('## 📜 Nova Core Commands\n*A powerful Discord bot with various features*')
-            )
-            .addSeparatorComponents(
-                new SeparatorBuilder()
-                    .setDivider(true)
-            )
-            .addTextDisplayComponents(
-                new TextDisplayBuilder()
-                    .setContent(commandList)
-            )
-            .addSeparatorComponents(
-                new SeparatorBuilder()
-                    .setDivider(true)
-            )
-            .addTextDisplayComponents(
-                new TextDisplayBuilder()
-                    .setContent('### ❓ Need Help? Or found Bugs?\n\nJoin our support server: [NovaCore Support](https://discord.gg/z4C6T5m88D)')
-            );
+        const helpEmbed = new EmbedBuilder()
+            .setTitle('📜 Nova Core Commands')
+            .setDescription('*A powerful Discord bot with various features*\n\n' + commandList)
+            .setColor(0x3498db)
+            .setFooter({ text: 'Need Help? Join our support server: discord.gg/z4C6T5m88D' });
 
-        await interaction.reply({ components: [container] });
+        await interaction.reply({ embeds: [helpEmbed] });
     }
 };

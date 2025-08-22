@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    SeparatorBuilder 
+} = require('discord.js');
 const ms = require('ms');
 
 module.exports = {
@@ -24,26 +29,26 @@ module.exports = {
         const member = await interaction.guild.members.fetch(target.id).catch(() => null);
 
         if (!interaction.member.permissions.has('ModerateMembers')) {
-            return interaction.reply({ content: 'You do not have permission to timeout members.', Flags: 64 });
+            return interaction.reply({ content: 'You do not have permission to timeout members.', flags: 64 });
         }
 
         if (!member) {
-            return interaction.reply({ content: 'User not found in this server.', Flags: 64 });
+            return interaction.reply({ content: 'User not found in this server.', flags: 64 });
         }
 
         if (!member.moderatable || member.id === interaction.guild.ownerId) {
-            return interaction.reply({ content: 'I cannot timeout this user.', Flags: 64 });
+            return interaction.reply({ content: 'I cannot timeout this user.', flags: 64 });
         }
 
         if (member.roles.highest.position >= interaction.member.roles.highest.position && interaction.user.id !== interaction.guild.ownerId) {
-            return interaction.reply({ content: 'You cannot timeout a member with equal or higher role.', Flags: 64 });
+            return interaction.reply({ content: 'You cannot timeout a member with equal or higher role.', flags: 64 });
         }
 
         const durationMs = ms(durationInput);
         if (!durationMs || durationMs < 10000 || durationMs > 14 * 24 * 60 * 60 * 1000) {
             return interaction.reply({ 
                 content: 'Invalid duration. Please use formats like `10m`, `1h`, `2d` (min: 10s, max: 14d).', 
-                Flags: 64 
+                flags: 64 
             });
         }
 
@@ -71,9 +76,9 @@ module.exports = {
                 new TextDisplayBuilder()
                     .setContent(`## ⏳ Member Timed Out`)
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
@@ -84,9 +89,9 @@ module.exports = {
                         `> **Date:** <t:${Math.floor(Date.now()/1000)}:F>`
                     )
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()

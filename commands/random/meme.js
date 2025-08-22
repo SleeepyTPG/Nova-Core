@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    SeparatorBuilder 
+} = require('discord.js');
 const fetch = require('node-fetch');
 
 const redditEndpoints = {
@@ -42,14 +47,28 @@ module.exports = {
 
             const meme = posts[Math.floor(Math.random() * posts.length)].data;
 
-            const embed = new EmbedBuilder()
-                .setTitle(meme.title)
-                .setURL(`https://reddit.com${meme.permalink}`)
-                .setImage(meme.url)
-                .setColor(0x00bfff)
-                .setFooter({ text: `From r/${meme.subreddit} | 👍 ${meme.ups} | Requested by ${interaction.user.tag}`, iconURL: interaction.user.displayAvatarURL() });
+            const container = new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `## 😂 Meme from r/${meme.subreddit}\n` +
+                            `[View on Reddit](https://reddit.com${meme.permalink})\n\n` +
+                            `![Meme Image](${meme.url})`
+                        )
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder()
+                        .setSpacing("Small")
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `> 👍 **${meme.ups}** upvotes\n` +
+                            `*Requested by ${interaction.user.tag}*`
+                        )
+                );
 
-            await interaction.editReply({ embeds: [embed] });
+            await interaction.editReply({ components: [container] });
         } catch (error) {
             await interaction.editReply({ content: 'Failed to fetch memes. Please try again later.' });
         }

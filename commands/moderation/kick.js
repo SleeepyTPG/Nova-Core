@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    SeparatorBuilder 
+} = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,19 +23,19 @@ module.exports = {
         const member = await interaction.guild.members.fetch(target.id).catch(() => null);
 
         if (!interaction.member.permissions.has('KickMembers')) {
-            return interaction.reply({ content: 'You do not have permission to kick members.', Flags: 64 });
+            return interaction.reply({ content: 'You do not have permission to kick members.', flags: 64 });
         }
 
         if (!member) {
-            return interaction.reply({ content: 'User not found in this server.', Flags: 64 });
+            return interaction.reply({ content: 'User not found in this server.', flags: 64 });
         }
 
         if (!member.kickable || member.id === interaction.guild.ownerId) {
-            return interaction.reply({ content: 'I cannot kick this user.', Flags: 64 });
+            return interaction.reply({ content: 'I cannot kick this user.', flags: 64 });
         }
 
         if (member.roles.highest.position >= interaction.member.roles.highest.position && interaction.user.id !== interaction.guild.ownerId) {
-            return interaction.reply({ content: 'You cannot kick a member with equal or higher role.', Flags: 64 });
+            return interaction.reply({ content: 'You cannot kick a member with equal or higher role.', flags: 64 });
         }
 
         try {
@@ -55,9 +60,9 @@ module.exports = {
                 new TextDisplayBuilder()
                     .setContent(`## 👢 Member Kicked`)
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
@@ -68,9 +73,9 @@ module.exports = {
                         `> **Date:** <t:${Math.floor(Date.now()/1000)}:F>`
                     )
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()

@@ -86,6 +86,8 @@ client.on('interactionCreate', async interaction => {
 
 client.once('ready', async () => {
     console.log(`🤖 ${client.user.tag} is online!`);
+    console.log('Discord.js version:', require('discord.js').version);
+    console.log(`Node.js version: ${process.version}`);
     console.log(`📊 Serving ${client.guilds.cache.size} servers`);
     
     await deployCommands();

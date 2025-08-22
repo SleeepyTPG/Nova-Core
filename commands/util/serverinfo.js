@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    SeparatorBuilder 
+} = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -30,9 +35,9 @@ module.exports = {
                 new TextDisplayBuilder()
                     .setContent(`## 🏰 Server Information: ${guild.name}`)
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
@@ -44,9 +49,9 @@ module.exports = {
                         `> **Verification Level:** ${guild.verificationLevel}`
                     )
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
@@ -57,9 +62,9 @@ module.exports = {
                         `> **Bots:** ${members.bots}`
                     )
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
@@ -71,9 +76,9 @@ module.exports = {
                         `> **Boosts:** ${boosts} (Level ${boostLevel})`
                     )
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()

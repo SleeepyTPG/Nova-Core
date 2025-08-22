@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    SeparatorBuilder 
+} = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -27,9 +32,9 @@ module.exports = {
                             `![Server Icon](${guild.iconURL({ size: 1024 })})`
                         )
                 )
-                .addSeperatorComponents(
-                    new SeperatorBuilder()
-                        .setDivider(true)
+                .addSeparatorComponents(
+                    new SeparatorBuilder()
+                        .setSpacing("Small")
                 )
                 .addTextDisplayComponents(
                     new TextDisplayBuilder()
@@ -51,9 +56,9 @@ module.exports = {
                         `![User Avatar](${targetUser.displayAvatarURL({ size: 1024, dynamic: true })})`
                     )
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
@@ -63,9 +68,9 @@ module.exports = {
                         `> **Account Created:** <t:${Math.floor(targetUser.createdTimestamp / 1000)}:F>`
                     )
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()

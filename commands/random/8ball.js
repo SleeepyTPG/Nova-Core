@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    SeparatorBuilder 
+} = require('discord.js');
 
 const responses = [
     "It is certain.",
@@ -38,9 +43,9 @@ module.exports = {
                 new TextDisplayBuilder()
                     .setContent(`## 🎱 Magic 8-Ball`)
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
@@ -51,9 +56,9 @@ module.exports = {
                         `> *${answer}*`
                     )
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()

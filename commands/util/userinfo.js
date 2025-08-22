@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, SeperatorBuilder } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    SeparatorBuilder 
+} = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -17,9 +22,9 @@ module.exports = {
                 new TextDisplayBuilder()
                     .setContent(`## 👤 User Information: ${user.tag}`)
             )
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
@@ -35,9 +40,9 @@ module.exports = {
 
         if (member) {
             container
-                .addSeperatorComponents(
-                    new SeperatorBuilder()
-                        .setDivider(true)
+                .addSeparatorComponents(
+                    new SeparatorBuilder()
+                        .setSpacing("Small")
                 )
                 .addTextDisplayComponents(
                     new TextDisplayBuilder()
@@ -49,27 +54,27 @@ module.exports = {
                         )
                 );
 
-            if (member.voice.channel) {
+            if (member.voice && member.voice.channel) {
                 container
-                    .addSeperatorComponents(
-                        new SeperatorBuilder()
-                            .setDivider(true)
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing("Small")
                     )
                     .addTextDisplayComponents(
                         new TextDisplayBuilder()
                             .setContent(
                                 `### Voice Status\n` +
                                 `> **Current Channel:** ${member.voice.channel.name}\n` +
-                                `> **Joined Voice:** <t:${Math.floor(member.voice.joinedTimestamp / 1000)}:R>`
+                                (member.voice.joinedTimestamp ? `> **Joined Voice:** <t:${Math.floor(member.voice.joinedTimestamp / 1000)}:R>` : '')
                             )
                     );
             }
         }
 
         container
-            .addSeperatorComponents(
-                new SeperatorBuilder()
-                    .setDivider(true)
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing("Small")
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder()

@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    SeparatorBuilder 
+} = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -31,27 +36,37 @@ module.exports = {
         const userId = target.id;
 
         if (!interaction.member.permissions.has('ModerateMembers')) {
-            return interaction.reply({ content: 'You do not have permission to view warnings.', ephemeral: true });
+            return interaction.reply({ content: 'You do not have permission to view warnings.', flags: 64 });
         }
 
         if (!warnings[guildId] || !warnings[guildId][userId] || warnings[guildId][userId].length === 0) {
-            return interaction.reply({ content: `${target.tag} has no warnings.`, ephemeral: true });
+            return interaction.reply({ content: `${target.tag} has no warnings.`, flags: 64 });
         }
 
         const userWarnings = warnings[guildId][userId];
-        const embed = new EmbedBuilder()
-            .setTitle(`Warnings for ${target.tag}`)
-            .setColor(0xFFA500)
-            .setThumbnail(target.displayAvatarURL())
-            .setDescription(`Total warnings: **${userWarnings.length}**`)
-            .addFields(
-                ...userWarnings.slice(-10).map((warn, i) => ({
-                    name: `#${userWarnings.length - 10 + i + 1} • ${warn.date.split('T')[0]}`,
-                    value: `**Reason:** ${warn.reason}\n**Moderator:** ${warn.moderator}`,
-                    inline: false
-                }))
+        const recentWarnings = userWarnings.slice(-10);
+
+        const container = new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(`# ⚠️ Warnings for ${target.tag}\nTotal warnings: **${userWarnings.length}**`)
             );
 
-        await interaction.reply({ embeds: [embed], ephemeral: true });
+        recentWarnings.forEach((warn, i) => {
+            container
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing("Small")
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `### #${userWarnings.length - recentWarnings.length + i + 1} • ${warn.date.split('T')[0]}\n` +
+                            `> **Reason:** ${warn.reason}\n` +
+                            `> **Moderator:** ${warn.moderator}`
+                        )
+                );
+        });
+
+        await interaction.reply({ components: [container], flags: 64 });
     }
 };
