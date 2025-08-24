@@ -2,7 +2,8 @@ const {
     SlashCommandBuilder, 
     ContainerBuilder, 
     TextDisplayBuilder, 
-    SeparatorBuilder 
+    SeparatorBuilder,
+    MessageFlags
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
@@ -36,11 +37,11 @@ module.exports = {
         const userId = target.id;
 
         if (!interaction.member.permissions.has('ModerateMembers')) {
-            return interaction.reply({ content: 'You do not have permission to view warnings.', flags: 64 });
+            return interaction.reply({ content: 'You do not have permission to view warnings.', flags: MessageFlags.Ephemeral });
         }
 
         if (!warnings[guildId] || !warnings[guildId][userId] || warnings[guildId][userId].length === 0) {
-            return interaction.reply({ content: `${target.tag} has no warnings.`, flags: 64 });
+            return interaction.reply({ content: `${target.tag} has no warnings.`, flags: MessageFlags.Ephemeral });
         }
 
         const userWarnings = warnings[guildId][userId];
@@ -67,6 +68,9 @@ module.exports = {
                 );
         });
 
-        await interaction.reply({ components: [container], flags: 64 });
+        await interaction.reply({ 
+            components: [container], 
+            flags: MessageFlags.IsComponentsV2 
+        });
     }
 };

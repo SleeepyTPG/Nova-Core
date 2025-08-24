@@ -2,7 +2,8 @@ const {
     SlashCommandBuilder, 
     ContainerBuilder, 
     TextDisplayBuilder, 
-    SeparatorBuilder 
+    SeparatorBuilder,
+    MessageFlags
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
@@ -45,21 +46,21 @@ module.exports = {
         if (!interaction.member.permissions.has('ModerateMembers')) {
             return interaction.reply({ 
                 content: 'You do not have permission to warn members.', 
-                flags: 64 
+                flags: MessageFlags.Ephemeral 
             });
         }
 
         if (!member) {
             return interaction.reply({ 
                 content: 'User not found in this server.', 
-                flags: 64 
+                flags: MessageFlags.Ephemeral 
             });
         }
 
         if (member.id === interaction.guild.ownerId) {
             return interaction.reply({ 
                 content: 'You cannot warn the server owner.', 
-                flags: 64 
+                flags: MessageFlags.Ephemeral 
             });
         }
 
@@ -127,6 +128,9 @@ module.exports = {
                     )
             );
 
-        await interaction.reply({ components: [container] });
+        await interaction.reply({ 
+            components: [container], 
+            flags: MessageFlags.IsComponentsV2 
+        });
     }
 };

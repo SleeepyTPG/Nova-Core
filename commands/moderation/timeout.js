@@ -2,7 +2,8 @@ const {
     SlashCommandBuilder, 
     ContainerBuilder, 
     TextDisplayBuilder, 
-    SeparatorBuilder 
+    SeparatorBuilder,
+    MessageFlags
 } = require('discord.js');
 const ms = require('ms');
 
@@ -29,26 +30,26 @@ module.exports = {
         const member = await interaction.guild.members.fetch(target.id).catch(() => null);
 
         if (!interaction.member.permissions.has('ModerateMembers')) {
-            return interaction.reply({ content: 'You do not have permission to timeout members.', flags: 64 });
+            return interaction.reply({ content: 'You do not have permission to timeout members.', flags: MessageFlags.Ephemeral });
         }
 
         if (!member) {
-            return interaction.reply({ content: 'User not found in this server.', flags: 64 });
+            return interaction.reply({ content: 'User not found in this server.', flags: MessageFlags.Ephemeral });
         }
 
         if (!member.moderatable || member.id === interaction.guild.ownerId) {
-            return interaction.reply({ content: 'I cannot timeout this user.', flags: 64 });
+            return interaction.reply({ content: 'I cannot timeout this user.', flags: MessageFlags.Ephemeral });
         }
 
         if (member.roles.highest.position >= interaction.member.roles.highest.position && interaction.user.id !== interaction.guild.ownerId) {
-            return interaction.reply({ content: 'You cannot timeout a member with equal or higher role.', flags: 64 });
+            return interaction.reply({ content: 'You cannot timeout a member with equal or higher role.', flags: MessageFlags.Ephemeral });
         }
 
         const durationMs = ms(durationInput);
         if (!durationMs || durationMs < 10000 || durationMs > 14 * 24 * 60 * 60 * 1000) {
             return interaction.reply({ 
                 content: 'Invalid duration. Please use formats like `10m`, `1h`, `2d` (min: 10s, max: 14d).', 
-                flags: 64 
+                flags: MessageFlags.Ephemeral 
             });
         }
 
@@ -65,7 +66,7 @@ module.exports = {
                             `**Expires:** <t:${Math.floor((Date.now() + durationMs) / 1000)}:R>`
                         )
                 );
-            await target.send({ components: [dmContainer] });
+            await target.send({ components: [dmContainer], flags: MessageFlags.IsComponentsV2 });
         } catch (err) {
         }
 
@@ -103,6 +104,9 @@ module.exports = {
                     )
             );
 
-        await interaction.reply({ components: [container] });
+        await interaction.reply({ 
+            components: [container], 
+            flags: MessageFlags.IsComponentsV2 
+        });
     }
 };

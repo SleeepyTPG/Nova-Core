@@ -2,7 +2,8 @@ const {
     SlashCommandBuilder, 
     ContainerBuilder, 
     TextDisplayBuilder, 
-    SeparatorBuilder 
+    SeparatorBuilder,
+    MessageFlags
 } = require('discord.js');
 
 module.exports = {
@@ -23,19 +24,19 @@ module.exports = {
         const member = await interaction.guild.members.fetch(target.id).catch(() => null);
 
         if (!interaction.member.permissions.has('KickMembers')) {
-            return interaction.reply({ content: 'You do not have permission to kick members.', flags: 64 });
+            return interaction.reply({ content: 'You do not have permission to kick members.', flags: MessageFlags.Ephemeral });
         }
 
         if (!member) {
-            return interaction.reply({ content: 'User not found in this server.', flags: 64 });
+            return interaction.reply({ content: 'User not found in this server.', flags: MessageFlags.Ephemeral });
         }
 
         if (!member.kickable || member.id === interaction.guild.ownerId) {
-            return interaction.reply({ content: 'I cannot kick this user.', flags: 64 });
+            return interaction.reply({ content: 'I cannot kick this user.', flags: MessageFlags.Ephemeral });
         }
 
         if (member.roles.highest.position >= interaction.member.roles.highest.position && interaction.user.id !== interaction.guild.ownerId) {
-            return interaction.reply({ content: 'You cannot kick a member with equal or higher role.', flags: 64 });
+            return interaction.reply({ content: 'You cannot kick a member with equal or higher role.', flags: MessageFlags.Ephemeral });
         }
 
         try {
@@ -49,7 +50,7 @@ module.exports = {
                             `**Moderator:** ${interaction.user.tag}`
                         )
                 );
-            await target.send({ components: [dmContainer] });
+            await target.send({ components: [dmContainer], flags: MessageFlags.IsComponentsV2 });
         } catch (err) {
         }
 
@@ -85,6 +86,9 @@ module.exports = {
                     )
             );
 
-        await interaction.reply({ components: [container] });
+        await interaction.reply({ 
+            components: [container], 
+            flags: MessageFlags.IsComponentsV2 
+        });
     }
 };
