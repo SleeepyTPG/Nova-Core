@@ -1,4 +1,12 @@
-const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    ButtonBuilder, 
+    ActionRowBuilder, 
+    ButtonStyle, 
+    MessageFlags 
+} = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -70,11 +78,22 @@ module.exports = {
         const row = new ActionRowBuilder().addComponents(buttons);
 
         const reply = await interaction.reply({
-            components: [generatePollDisplay(), row],
-            fetchReply: true
+            components: [row],
+            flags: MessageFlags.IsComponentsV2,
+            allowedMentions: { parse: [] },
+            content: ' ',
+            embeds: [],
+            componentsv2: [generatePollDisplay()]
+        }).catch(async () => {
+            await interaction.reply({
+                content: '## 📊 ' + question + '\n\n*Container v2 is not supported on this server or bot version.*',
+                components: [row]
+            });
         });
 
-        const collector = reply.createMessageComponentCollector({ time: 600000 }); // 10 minutes
+        const message = await interaction.fetchReply();
+
+        const collector = message.createMessageComponentCollector({ time: 600000 });
 
         collector.on('collect', async i => {
             const optionIndex = parseInt(i.customId.split('_')[1]);
@@ -86,14 +105,27 @@ module.exports = {
 
             votes.get(selectedOption).add(i.user.id);
 
+            const updatedRow = new ActionRowBuilder().addComponents(
+                options.map((option, idx) =>
+                    new ButtonBuilder()
+                        .setCustomId(`poll_${idx}`)
+                        .setLabel(`Option ${idx + 1}`)
+                        .setStyle(ButtonStyle.Primary)
+                )
+            );
+
             await i.update({
-                components: [generatePollDisplay(), row]
+                components: [updatedRow],
+                flags: MessageFlags.IsComponentsV2,
+                allowedMentions: { parse: [] },
+                content: ' ',
+                embeds: [],
+                componentsv2: [generatePollDisplay()]
             });
         });
 
-        collector.on('end', () => {
-            const finalDisplay = generatePollDisplay();
-            const disabledButtons = options.map((_, index) => 
+        collector.on('end', async () => {
+            const disabledButtons = options.map((option, index) =>
                 new ButtonBuilder()
                     .setCustomId(`poll_${index}`)
                     .setLabel(`Option ${index + 1}`)
@@ -103,9 +135,13 @@ module.exports = {
 
             const disabledRow = new ActionRowBuilder().addComponents(disabledButtons);
 
-            interaction.editReply({
-                components: [finalDisplay, disabledRow],
-                content: '**Poll Ended**'
+            await interaction.editReply({
+                components: [disabledRow],
+                flags: MessageFlags.IsComponentsV2,
+                allowedMentions: { parse: [] },
+                content: '**Poll Ended**',
+                embeds: [],
+                componentsv2: [generatePollDisplay()]
             });
         });
     }

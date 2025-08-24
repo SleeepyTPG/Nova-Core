@@ -1,6 +1,6 @@
 {
   "name": "nova-core",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "description": "A powerful Discord bot with moderation, utility, and fun commands",
   "main": "main.js",
   "scripts": {

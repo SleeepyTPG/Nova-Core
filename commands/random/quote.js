@@ -1,4 +1,10 @@
-const { SlashCommandBuilder, ContainerBuilder, TextDisplayBuilder, PermissionFlagsBits } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    PermissionFlagsBits, 
+    MessageFlags 
+} = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -54,7 +60,7 @@ module.exports = {
             if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
                 return interaction.reply({
                     content: 'You need Administrator permissions to use this command.',
-                    Flags: 64
+                    flags: MessageFlags.Ephemeral
                 });
             }
             const channel = interaction.options.getChannel('channel');
@@ -67,7 +73,7 @@ module.exports = {
                 );
             return interaction.reply({
                 components: [container],
-                Flags: 64
+                flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
             });
         }
         const quote = interaction.options.getString('quote');
@@ -77,7 +83,7 @@ module.exports = {
         if (!channelId) {
             return interaction.reply({
                 content: 'Quotes channel not set! Ask an administrator to set it using `/quote setchannel`',
-                Flags: 64
+                flags: MessageFlags.Ephemeral
             });
         }
         try {
@@ -86,7 +92,7 @@ module.exports = {
             if (!quotesChannel) {
                 return interaction.reply({
                     content: 'Quotes channel not found! Please contact an administrator.',
-                    Flags: 64
+                    flags: MessageFlags.Ephemeral
                 });
             }
             const container = new ContainerBuilder()
@@ -101,7 +107,8 @@ module.exports = {
                         )
                 );
             await quotesChannel.send({
-                components: [container]
+                components: [container],
+                flags: MessageFlags.IsComponentsV2
             });
             const confirmContainer = new ContainerBuilder()
                 .addTextDisplayComponents(
@@ -110,13 +117,13 @@ module.exports = {
                 );
             await interaction.reply({
                 components: [confirmContainer],
-                Flags: 64
+                flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
             });
         } catch (error) {
             console.error('Error in quote command:', error);
             await interaction.reply({
                 content: 'Failed to submit quote. Please try again later.',
-                Flags: 64
+                flags: MessageFlags.Ephemeral
             });
         }
     }
