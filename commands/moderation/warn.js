@@ -7,6 +7,7 @@ const {
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const { logAction } = require('../util/logger');
 
 const WARN_FILE = path.join(__dirname, '..', '..', 'data', 'warnings.json');
 
@@ -93,7 +94,7 @@ module.exports = {
                             `*Use \`/warnings\` in the server to view all your warnings.*`
                         )
                 );
-            await target.send({ components: [dmContainer] });
+            await target.send({ components: [dmContainer], flags: MessageFlags.IsComponentsV2 });
         } catch (err) {
         }
 
@@ -132,5 +133,13 @@ module.exports = {
             components: [container], 
             flags: MessageFlags.IsComponentsV2 
         });
+
+        await logAction(interaction, '⚠️ Warn Logged', [
+            `**User:** ${target.tag} (${target.id})`,
+            `**Warned by:** ${interaction.user.tag}`,
+            `**Reason:** ${reason}`,
+            `**Total Warnings:** ${warnings[guildId][userId].length}`,
+            `**Date:** <t:${Math.floor(Date.now()/1000)}:F>`
+        ]);
     }
 };

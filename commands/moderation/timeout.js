@@ -6,6 +6,7 @@ const {
     MessageFlags
 } = require('discord.js');
 const ms = require('ms');
+const { logAction } = require('../util/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -108,5 +109,14 @@ module.exports = {
             components: [container], 
             flags: MessageFlags.IsComponentsV2 
         });
+
+        await logAction(interaction, '⏳ Timeout Logged', [
+            `**User:** ${target.tag} (${target.id})`,
+            `**Timed out by:** ${interaction.user.tag}`,
+            `**Duration:** ${durationInput}`,
+            `**Expires:** <t:${Math.floor((Date.now() + durationMs) / 1000)}:R>`,
+            `**Reason:** ${reason}`,
+            `**Date:** <t:${Math.floor(Date.now()/1000)}:F>`
+        ]);
     }
 };

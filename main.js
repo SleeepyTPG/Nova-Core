@@ -3,6 +3,7 @@ require('dotenv').config();
 const { Client, Collection, GatewayIntentBits, Partials, REST, Routes } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const { logAction } = require('./commands/util/logger');
 
 const client = new Client({
     intents: [
@@ -99,4 +100,119 @@ process.on('unhandledRejection', error => console.error('Unhandled promise rejec
 client.login(process.env.BOT_TOKEN).catch(error => {
     console.error('Failed to login:', error);
     process.exit(1);
+});
+
+client.on('guildMemberAdd', async member => {
+    await logAction(
+        { guild: member.guild },
+        '👋 Member Joined',
+        [
+            `**User:** ${member.user.tag} (${member.id})`,
+            `**Account Created:** <t:${Math.floor(member.user.createdTimestamp / 1000)}:F>`,
+            `**Joined:** <t:${Math.floor(Date.now() / 1000)}:F>`
+        ]
+    );
+});
+
+client.on('guildMemberRemove', async member => {
+    await logAction(
+        { guild: member.guild },
+        '👋 Member Left',
+        [
+            `**User:** ${member.user.tag} (${member.id})`,
+            `**Joined:** <t:${Math.floor(member.joinedTimestamp / 1000)}:F>`,
+            `**Left:** <t:${Math.floor(Date.now() / 1000)}:F>`
+        ]
+    );
+});
+
+client.on('guildBanAdd', async ban => {
+    await logAction(
+        { guild: ban.guild },
+        '🔨 Member Banned',
+        [
+            `**User:** ${ban.user.tag} (${ban.user.id})`,
+            `**Banned:** <t:${Math.floor(Date.now() / 1000)}:F>`
+        ]
+    );
+});
+
+client.on('guildBanRemove', async ban => {
+    await logAction(
+        { guild: ban.guild },
+        '✅ Member Unbanned',
+        [
+            `**User:** ${ban.user.tag} (${ban.user.id})`,
+            `**Unbanned:** <t:${Math.floor(Date.now() / 1000)}:F>`
+        ]
+    );
+});
+
+client.on('messageDelete', async message => {
+    if (!message.guild || message.partial || message.system) return;
+    await logAction(
+        { guild: message.guild },
+        '🗑️ Message Deleted',
+        [
+            `**Channel:** <#${message.channel.id}>`,
+            `**Author:** ${message.author ? `${message.author.tag} (${message.author.id})` : 'Unknown'}`,
+            `**Content:**\n${message.content || '*No content*'}`,
+            `**Deleted:** <t:${Math.floor(Date.now() / 1000)}:F>`
+        ]
+    );
+});
+
+client.on('messageUpdate', async (oldMessage, newMessage) => {
+    if (!oldMessage.guild || oldMessage.partial || newMessage.partial || oldMessage.system) return;
+    if (oldMessage.content === newMessage.content) return;
+    await logAction(
+        { guild: oldMessage.guild },
+        '✏️ Message Edited',
+        [
+            `**Channel:** <#${oldMessage.channel.id}>`,
+            `**Author:** ${oldMessage.author ? `${oldMessage.author.tag} (${oldMessage.author.id})` : 'Unknown'}`,
+            `**Before:**\n${oldMessage.content || '*No content*'}`,
+            `**After:**\n${newMessage.content || '*No content*'}`,
+            `**Edited:** <t:${Math.floor(Date.now() / 1000)}:F>`
+        ]
+    );
+});
+
+client.on('voiceStateUpdate', async (oldState, newState) => {
+    if (!oldState.guild) return;
+    const user = newState.member ? newState.member.user : oldState.member.user;
+    let action = null;
+    let details = [];
+
+    if (!oldState.channel && newState.channel) {
+        action = '🔊 Voice Join';
+        details = [
+            `**User:** ${user.tag} (${user.id})`,
+            `**Channel:** ${newState.channel.name}`,
+            `**Joined:** <t:${Math.floor(Date.now() / 1000)}:F>`
+        ];
+    } else if (oldState.channel && !newState.channel) {
+        action = '🔇 Voice Leave';
+        details = [
+            `**User:** ${user.tag} (${user.id})`,
+            `**Channel:** ${oldState.channel.name}`,
+            `**Left:** <t:${Math.floor(Date.now() / 1000)}:F>`
+        ];
+    } else if (oldState.channel && newState.channel && oldState.channel.id !== newState.channel.id) {
+        action = '🔄 Voice Move';
+        details = [
+            `**User:** ${user.tag} (${user.id})`,
+            `**From:** ${oldState.channel.name}`,
+            `**To:** ${newState.channel.name}`,
+            `**Moved:** <t:${Math.floor(Date.now() / 1000)}:F>`
+        ];
+    }
+
+    if (action) {
+        await logAction(
+            { guild: oldState.guild },
+            action,
+            details
+        );
+    }
 });

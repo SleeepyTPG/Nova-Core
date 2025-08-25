@@ -5,6 +5,7 @@ const {
     SeparatorBuilder,
     MessageFlags
 } = require('discord.js');
+const { logAction } = require('../util/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -90,5 +91,12 @@ module.exports = {
             components: [container], 
             flags: MessageFlags.IsComponentsV2 
         });
+
+        await logAction(interaction, '👢 Kick Logged', [
+            `**User:** ${target.tag} (${target.id})`,
+            `**Kicked by:** ${interaction.user.tag}`,
+            `**Reason:** ${reason}`,
+            `**Date:** <t:${Math.floor(Date.now()/1000)}:F>`
+        ]);
     }
 };

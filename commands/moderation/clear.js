@@ -1,4 +1,11 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { 
+    SlashCommandBuilder, 
+    ContainerBuilder, 
+    TextDisplayBuilder, 
+    SeparatorBuilder, 
+    MessageFlags 
+} = require('discord.js');
+const { logAction } = require('../util/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,18 +19,56 @@ module.exports = {
         const amount = interaction.options.getInteger('amount');
 
         if (!interaction.member.permissions.has('ManageMessages')) {
-            return interaction.reply({ content: 'You do not have permission to manage messages.', Flags: 64 });
+            return interaction.reply({ 
+                content: 'You do not have permission to manage messages.', 
+                flags: MessageFlags.Ephemeral 
+            });
         }
 
         if (amount < 2 || amount > 100) {
-            return interaction.reply({ content: 'Please specify a number between 2 and 100.', Flags: 64 });
+            return interaction.reply({ 
+                content: 'Please specify a number between 2 and 100.', 
+                flags: MessageFlags.Ephemeral 
+            });
         }
 
         try {
             await interaction.channel.bulkDelete(amount, true);
-            await interaction.reply({ content: `🧹 Deleted ${amount} messages.`, Flags: 64 });
+
+            const container = new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(`## 🧹 Messages Deleted`)
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing("Small")
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `> **Amount:** ${amount}\n` +
+                            `> **Channel:** <#${interaction.channel.id}>\n` +
+                            `> **Moderator:** ${interaction.user.tag}\n` +
+                            `> **Date:** <t:${Math.floor(Date.now()/1000)}:F>`
+                        )
+                );
+
+            await interaction.reply({ 
+                components: [container], 
+                flags: MessageFlags.IsComponentsV2 
+            });
+
+            await logAction(interaction, '🧹 Clear Logged', [
+                `**Amount:** ${amount}`,
+                `**Channel:** <#${interaction.channel.id}>`,
+                `**Moderator:** ${interaction.user.tag}`,
+                `**Date:** <t:${Math.floor(Date.now()/1000)}:F>`
+            ]);
         } catch (error) {
-            await interaction.reply({ content: 'Failed to delete messages. I can only delete messages younger than 14 days.', Flags: 64 });
+            await interaction.reply({ 
+                content: 'Failed to delete messages. I can only delete messages younger than 14 days.', 
+                flags: MessageFlags.Ephemeral 
+            });
         }
     }
 };
