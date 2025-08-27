@@ -61,7 +61,7 @@ module.exports = {
                 .addTextDisplayComponents(
                     new TextDisplayBuilder()
                         .setContent(
-                            `### #${userWarnings.length - recentWarnings.length + i + 1} • ${warn.date.split('T')[0]}\n` +
+                            `## #${userWarnings.length - recentWarnings.length + i + 1} • ${warn.date.split('T')[0]}\n` +
                             `> **Reason:** ${warn.reason}\n` +
                             `> **Moderator:** ${warn.moderator}`
                         )

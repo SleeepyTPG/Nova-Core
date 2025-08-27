@@ -65,8 +65,10 @@ module.exports = {
                     .setContent(`*Asked by ${interaction.user.tag}*`)
             );
 
-        await interaction.reply({
-            components: [container]
-        });
+      await interaction.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { parse: [] },
+      });
     }
 };

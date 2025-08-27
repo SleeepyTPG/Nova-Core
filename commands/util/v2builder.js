@@ -8,7 +8,7 @@ const {
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('ConatinerV2')
+        .setName('v2builder')
         .setDescription('Create a custom Container v2 message')
         .addSubcommand(subcommand =>
             subcommand

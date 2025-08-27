@@ -36,8 +36,11 @@ async function logAction(interaction, title, fields) {
     });
 
     await logChannel.send({
+        content: ' ',
+        embeds: [],
         components: [container],
-        flags: MessageFlags.IsComponentsV2
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { parse: [] }
     });
 }
 
