@@ -40,7 +40,9 @@ module.exports = {
             );
 
         await interaction.reply({
-            components: [container]
+            components: [container],
+            flags: MessageFlags.isComponentV2,
+            allowedMentions: { parse: []}
         });
     }
 };
