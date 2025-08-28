@@ -90,6 +90,11 @@ client.once('ready', async () => {
     console.log('Discord.js version:', require('discord.js').version);
     console.log(`Node.js version: ${process.version}`);
     console.log(`📊 Serving ${client.guilds.cache.size} servers`);
+
+    client.user.setActivity("Developing...", {
+        type: "STREAMING",
+        url: "https://www.discord.gg/cSYe7NFrnR"
+    })
     
     await deployCommands();
 });
