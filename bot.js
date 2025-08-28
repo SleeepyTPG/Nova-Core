@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { Client, Collection, GatewayIntentBits, Partials, REST, Routes } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials, REST, Routes, ActivityType } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const { logAction } = require('./commands/util/logger');
