@@ -32,7 +32,7 @@ function buildIncidentContainer(incident) {
     .map((log) => `[${log.time}] <@${log.user}>: ${log.message}`)
     .join("\n");
 
-  const section = new SectionBuilder().addComponents(
+  const section = new SectionBuilder().addTextDisplayComponents(
     new TextDisplayBuilder().setContent(
       `## 🚨 [Incident #${incident.id}]\n\n` +
         `**${incident.title}**\n\n${incident.details}\n\n` +
