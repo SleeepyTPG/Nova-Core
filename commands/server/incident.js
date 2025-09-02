@@ -32,7 +32,7 @@ function buildIncidentContainer(incident) {
     .map((log) => `[${log.time}] <@${log.user}>: ${log.message}`)
     .join("\n");
 
-  const section = new SectionBuilder().addTextDisplayComponents(
+  const section = new SectionBuilder().setComponents(
     new TextDisplayBuilder().setContent(
       `## 🚨 [Incident #${incident.id}]\n\n` +
         `**${incident.title}**\n\n${incident.details}\n\n` +
@@ -41,9 +41,10 @@ function buildIncidentContainer(incident) {
     )
   );
 
-  return new ContainerBuilder()
-    .addComponents(section)
-    .addComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+  return new ContainerBuilder().setComponents(
+    section,
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small)
+  );
 }
 
 module.exports = {
