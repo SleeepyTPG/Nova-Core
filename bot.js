@@ -4,6 +4,8 @@ const { Client, Collection, GatewayIntentBits, Partials, REST, Routes, ActivityT
 const fs = require('fs');
 const path = require('path');
 const { logAction } = require('./commands/util/logger');
+const Discord = require("discord.js")
+const welcomer = require("./commands/server/welcomer.js");
 
 const client = new Client({
     intents: [
@@ -91,10 +93,9 @@ client.once('ready', async () => {
     console.log(`Node.js version: ${process.version}`);
     console.log(`📊 Serving ${client.guilds.cache.size} servers`);
 
-    client.user.setActivity("Developing... | discord.gg/cSYe7NFrnR", {
+client.user.setActivity("Developing... | discord.gg/cSYe7NFrnR", {
     type: Discord.ActivityType.Watching
-    }
-);
+});
     
     await deployCommands();
 });
@@ -220,4 +221,11 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
             details
         );
     }
+
+client.on("guildMemberAdd", (member) => {
+  if (welcomer.onGuildMemberAdd) {
+    welcomer.onGuildMemberAdd(member);
+  }
+});
+
 });
