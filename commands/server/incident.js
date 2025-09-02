@@ -1,156 +1,151 @@
 const {
   SlashCommandBuilder,
+  PermissionFlagsBits,
+  ChannelType,
+} = require("discord.js");
+const {
   ContainerBuilder,
   SectionBuilder,
   TextDisplayBuilder,
   SeparatorBuilder,
   SeparatorSpacingSize,
-  MessageFlags
 } = require("discord.js");
-const fs = require("fs");
-const path = require("path");
-
-const INCIDENTS_PATH = path.join(__dirname, "..", "..", "data", "incidents.json");
-
-if (!fs.existsSync(path.dirname(INCIDENTS_PATH))) {
-  fs.mkdirSync(path.dirname(INCIDENTS_PATH), { recursive: true });
-}
 
 let incidents = {};
-if (fs.existsSync(INCIDENTS_PATH)) {
-  incidents = JSON.parse(fs.readFileSync(INCIDENTS_PATH, "utf8"));
+let incidentCounter = 1;
+
+function formatStatus(status) {
+  switch (status) {
+    case "open":
+      return "❌ **Status:** Open";
+    case "investigating":
+      return "🔎 **Status:** Investigating";
+    case "resolved":
+      return "✅ **Status:** Resolved";
+    default:
+      return "⚪ **Status:** Unknown";
+  }
 }
 
-function saveIncidents() {
-  fs.writeFileSync(INCIDENTS_PATH, JSON.stringify(incidents, null, 2));
-}
+function buildIncidentContainer(incident) {
+  const logLines = incident.logs
+    .map((log) => `[${log.time}] <@${log.user}>: ${log.message}`)
+    .join("\n");
 
-const DEVELOPER_IDS = ["1104736921474834493", ""];
+  const section = new SectionBuilder().addComponents(
+    new TextDisplayBuilder().setContent(
+      `## 🚨 [Incident #${incident.id}]\n\n` +
+        `**${incident.title}**\n\n${incident.details}\n\n` +
+        formatStatus(incident.status) +
+        `\n\n📜 **Update Log:**\n${logLines}`
+    )
+  );
+
+  return new ContainerBuilder()
+    .addComponents(section)
+    .addComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+}
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("incident")
-    .setDescription("Manage incidents (developer-only)")
+    .setDescription("Manage incidents (developer only).")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((sub) =>
       sub
         .setName("create")
-        .setDescription("Create a new incident")
+        .setDescription("Create a new incident.")
         .addStringOption((opt) =>
-          opt.setName("title").setDescription("Incident title").setRequired(true)
+          opt.setName("title").setDescription("Title of the incident").setRequired(true)
         )
         .addStringOption((opt) =>
-          opt
-            .setName("details")
-            .setDescription("Details about the incident")
-            .setRequired(true)
-        )
-        .addStringOption((opt) =>
-          opt
-            .setName("status")
-            .setDescription("Initial incident status")
-            .addChoices(
-              { name: "🟥 Ongoing", value: "ongoing" },
-              { name: "🟩 Resolved", value: "resolved" },
-              { name: "🟨 Monitoring", value: "monitoring" }
-            )
-            .setRequired(true)
+          opt.setName("details").setDescription("Details about the incident").setRequired(true)
         )
         .addChannelOption((opt) =>
-          opt.setName("channel").setDescription("Where to post the incident")
+          opt
+            .setName("channel")
+            .setDescription("Channel to post the incident in")
+            .addChannelTypes(ChannelType.GuildText)
+        )
+        .addRoleOption((opt) =>
+          opt.setName("ping").setDescription("Role to ping when posting (optional)")
         )
     )
     .addSubcommand((sub) =>
       sub
         .setName("update")
-        .setDescription("Update an existing incident")
+        .setDescription("Update an incident.")
         .addIntegerOption((opt) =>
           opt.setName("id").setDescription("Incident ID").setRequired(true)
         )
         .addStringOption((opt) =>
-          opt
-            .setName("status")
-            .setDescription("New status")
-            .addChoices(
-              { name: "🟥 Ongoing", value: "ongoing" },
-              { name: "🟩 Resolved", value: "resolved" },
-              { name: "🟨 Monitoring", value: "monitoring" }
-            )
+          opt.setName("status").setDescription("New status").addChoices(
+            { name: "Open", value: "open" },
+            { name: "Investigating", value: "investigating" },
+            { name: "Resolved", value: "resolved" }
+          )
         )
         .addStringOption((opt) =>
-          opt.setName("message").setDescription("Additional log message")
+          opt.setName("message").setDescription("Log message to add")
         )
         .addChannelOption((opt) =>
-          opt.setName("channel").setDescription("Where to post the update")
+          opt
+            .setName("channel")
+            .setDescription("Channel to post update in (optional)")
+            .addChannelTypes(ChannelType.GuildText)
         )
     ),
 
   async execute(interaction) {
-    if (!DEVELOPER_IDS.includes(interaction.user.id)) {
-      return interaction.reply({
-        content: "❌ This command is developer-only.",
-        ephemeral: true,
-      });
-    }
+    const sub = interaction.options.getSubcommand();
 
-    const subcommand = interaction.options.getSubcommand();
-
-    if (subcommand === "create") {
+    if (sub === "create") {
       const title = interaction.options.getString("title");
       const details = interaction.options.getString("details");
-      const status = interaction.options.getString("status");
       const targetChannel = interaction.options.getChannel("channel");
+      const pingRole = interaction.options.getRole("ping");
 
-      const incidentId = Object.keys(incidents).length + 1;
-      const now = new Date().toLocaleString();
-
-      incidents[incidentId] = {
-        id: incidentId,
+      const id = incidentCounter++;
+      const incident = {
+        id,
         title,
         details,
-        status,
-        created: now,
+        status: "open",
         logs: [
-          { time: now, user: interaction.user.id, message: "Incident created." },
+          {
+            time: new Date().toLocaleString(),
+            user: interaction.user.id,
+            message: "Incident created.",
+          },
         ],
       };
-      saveIncidents();
+      incidents[id] = incident;
 
-      const container = new ContainerBuilder().addComponents(
-        new SectionBuilder().addComponents(
-          new TextDisplayBuilder().setContent(
-            `## 🚨 [Incident #${incidentId}]\n\n` +
-              `**${title}**\n\n${details}\n\n` +
-              formatStatus(status) +
-              `\n\n🕒 *Created:* ${now}`
-          )
-        ).addComponents(
-          new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small)
-        )
-      );
+      const container = buildIncidentContainer(incident);
+      const content = pingRole ? `${pingRole}` : null;
 
       if (targetChannel) {
         await targetChannel.send({
-          content: `📢 **New Incident #${incidentId}**`,
+          content,
           components: [container],
         });
         return interaction.reply({
-          content: `✅ Incident #${incidentId} posted in ${targetChannel}`,
+          content: `✅ Incident #${id} created in ${targetChannel}`,
           ephemeral: true,
         });
       } else {
         return interaction.reply({
-          content: `📢 **New Incident #${incidentId}**`,
+          content,
           components: [container],
         });
       }
     }
 
-    if (subcommand === "update") {
+    if (sub === "update") {
       const id = interaction.options.getInteger("id");
       const newStatus = interaction.options.getString("status");
-      const message = interaction.options.getString("message");
+      const logMessage = interaction.options.getString("message");
       const targetChannel = interaction.options.getChannel("channel");
-      const now = new Date().toLocaleString();
 
       const incident = incidents[id];
       if (!incident) {
@@ -161,25 +156,15 @@ module.exports = {
       }
 
       if (newStatus) incident.status = newStatus;
-      if (message) {
-        incident.logs.push({ time: now, user: interaction.user.id, message });
+      if (logMessage) {
+        incident.logs.push({
+          time: new Date().toLocaleString(),
+          user: interaction.user.id,
+          message: logMessage,
+        });
       }
-      saveIncidents();
 
-      const logLines = incident.logs
-        .map((log) => `[${log.time}] <@${log.user}>: ${log.message}`)
-        .join("\n");
-
-      const container = new ContainerBuilder().addComponents(
-        new SectionBuilder().addComponents(
-          new TextDisplayBuilder().setContent(
-            `## 🚨 [Incident #${incident.id}]\n\n` +
-              `**${incident.title}**\n\n${incident.details}\n\n` +
-              formatStatus(incident.status) +
-              `\n\n📜 **Update Log:**\n${logLines}`
-          )
-        )
-      );
+      const container = buildIncidentContainer(incident);
 
       if (targetChannel) {
         await targetChannel.send({
@@ -194,17 +179,8 @@ module.exports = {
         return interaction.reply({
           content: `🔄 **Incident #${id} Updated**`,
           components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        allowedMentions: { parse: [] }
         });
       }
     }
   },
 };
-
-function formatStatus(status) {
-  if (status === "ongoing") return "🟥 **Ongoing Incident**";
-  if (status === "resolved") return "🟩 **Resolved**";
-  if (status === "monitoring") return "🟨 **Monitoring**";
-  return "❔ Unknown Status";
-}
