@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="resources/discontinued.png" alt="Discontinued Logo" width="400">
+</p>
+
+<p align="center">
   <img src="resources/novacore.png" alt="NovaCore Logo" width="400"/>
 </p>
 

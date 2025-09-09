@@ -228,4 +228,14 @@ client.on("guildMemberAdd", (member) => {
   }
 });
 
+client.on('interactionCreate', async interaction => {
+  if (interaction.isChatInputCommand()) {
+    await require('./commands/server/incident').execute(interaction);
+  }
+
+  if (interaction.isButton()) {
+    await require('./commands/server/incident').handleButton(interaction);
+  }
+});
+
 });
